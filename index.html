@@ -45,12 +45,12 @@
   </head>
   <body>
     <h1>Generate SVG icons for CSS hover effect</h1>
-    <h2>Mix 2 SVG files into 1 in order to alternate between the 2 SVGs on hover in HTML and CSS</h2>
+    <h2>Combine 2 SVG files into 1 in order to alternate between the 2 SVGs on hover in HTML and CSS</h2>
     <div>
         <label for="normal">
             Normal icon's filename pattern:
         </label>
-        <input type="text" name="normal" id="normal" value="_light"/> 
+        <input type="text" name="normal" id="normal" value="_unfilled"/> 
     </div>
     <div>
         <label for="hover">
@@ -60,10 +60,16 @@
     </div>
     <div>
         <small>
-            Example: if you have <b>bell_light.svg</b> (normal icon) and <b>bell_filled.svg</b> (hovered icon), then the pattern will be <b>_light</b> (normal icon) and <b>_filled</b> (hovered icon).
+            Example: if you have <b>bell_unfilled.svg</b> (normal icon) and <b>bell_filled.svg</b> (hovered icon), then the pattern will be <b>_unfilled</b> (normal icon) and <b>_filled</b> (hovered icon).
             <br>
-            PS: the 2 files to be mixed should have the same filename + the pattern for normal and hovered icon.
+            PS: the 2 files to be combined should have the same filename + the pattern for normal and hovered icon.
         </small>
+    </div>
+    <div>
+        <label for="hover">
+            Generated SVG filename suffix:
+        </label>
+        <input type="text" name="suffix" id="suffix" value="-with-hover"/> 
     </div>
     <div>
         <label for="files">
@@ -75,20 +81,23 @@
         <button id="generate">Generate and download new SVG files</button>
     </div>
 	<script>
+        var zip;
         var files;
         var icons = [];
         var normal = '';
         var hover = '';
-        var zip = new JSZip();
-        var filesIndex;
-        var filesQty;
+        var suffix = '';
+        var filesQty = 0;
+        var filesIndex = 0;
         
         document.querySelector('#generate').addEventListener('click', (e) => {
+            zip = new JSZip()
+            files = document.getElementById("files").files;
             normal = document.querySelector('#normal').value;
             hover = document.querySelector('#hover').value;
-            files = document.getElementById("files").files;
-            filesIndex = 0;
+            suffix = document.querySelector('#suffix').value;
             filesQty = document.getElementById("files").files.length;
+            filesIndex = 0;
 
             Object.keys(files).forEach(i => {
                 var filename = files[i].name.slice(0,-4);
@@ -119,7 +128,7 @@
                         fileContent = fileContent.replace(svgCloseTag, '');
                         icons[filename][type] = fileContent;
 
-                        zip.file(filename + '-with-hover.svg', icons[filename]['first_line'] + '\n' + '<g class=\"first-icon\">' + '\n' + icons[filename]['normal'] + '\n' + '</g>' + '\n' + '<g class=\"second-icon\">' + '\n' + icons[filename]['hover'] + '\n' + '</g>' + '\n' + '</svg>')
+                        zip.file(filename + suffix + '.svg', icons[filename]['first_line'] + '\n' + '<g class=\"first-icon\">' + '\n' + icons[filename]['normal'] + '\n' + '</g>' + '\n' + '<g class=\"second-icon\">' + '\n' + icons[filename]['hover'] + '\n' + '</g>' + '\n' + '</svg>')
                     }
                     else{
                         var svgOpenTag = fileContent.match(/<svg(.*?)>/)[0];
@@ -150,7 +159,7 @@
         Example:
         <br>
         <br>
-        <b>bell_light.svg</b> (normal icon):
+        <b>bell_unfilled.svg</b> (normal icon):
         <br>
         <pre>
 &lt;svg width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;
@@ -290,6 +299,9 @@
     </div>
     <div>
         Developed by <a href="https://cawecoy.com">Cawe Coy Rodrigues Marega</a>
+    </div>
+    <div>
+        <a href="https://github.com/cawecoy/alternate-svg-on-hover-css">Source code on GitHub</a>
     </div>
   </body>
 </html>
